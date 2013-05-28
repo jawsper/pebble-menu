@@ -26,33 +26,11 @@ public class MusicIntentReceiver extends BroadcastReceiver
 {
 	private static final PebbleMenu pebbleMenu = new PebbleMenu();
 
-	enum MediaMode
-	{
-		NO_CHANGE, TOGGLE, MUSIC_PLAYER, MENU
-	}
-
-	public class MetaData
-	{
-		public MetaData( String artist, String track, String album )
-		{
-			this.artist = artist;
-			this.track = track;
-			this.album = album;
-		}
-
-		public String artist;
-		public String track;
-		public String album;
-	}
-
 	private static final String TAG = "MusicIntentReceiver";
 	private static final int modeSwitchTime = 500;
 
-	private static MediaMode currentMediaMode = MediaMode.MUSIC_PLAYER;
 	private static long lastButtonPressed = 0;
 	private static Runnable doubleClickTimeout = null;
-
-	private static MetaData nowPlaying = null;
 
 	private static Handler handler = new Handler()
 	{
@@ -60,6 +38,7 @@ public class MusicIntentReceiver extends BroadcastReceiver
 
 	@Override public void onReceive( final Context context, Intent intent )
 	{
+		// Log.d( TAG, "onReceive: " + intent.toString() );
 		if( intent.getAction() == Intent.ACTION_MEDIA_BUTTON )
 		{
 			KeyEvent keyEvent = (KeyEvent)intent.getExtras().get( Intent.EXTRA_KEY_EVENT );
@@ -74,15 +53,7 @@ public class MusicIntentReceiver extends BroadcastReceiver
 						long now = new Date().getTime();
 						if( now - lastButtonPressed < modeSwitchTime )
 						{
-							boolean doSwitch = pebbleMenu.onDoubleClick();
-							if( doSwitch )
-							{
-								setMode( context, MediaMode.TOGGLE );
-							}
-							else
-							{
-								updateMetadataDisplay( context );
-							}
+							pebbleMenu.onDoubleClick( context );
 							handler.removeCallbacks( doubleClickTimeout );
 							doubleClickTimeout = null;
 						}
@@ -141,12 +112,18 @@ public class MusicIntentReceiver extends BroadcastReceiver
 		else if( intent.getAction().startsWith( "com.android.music" ) )
 		{
 			String artist = intent.getStringExtra( "artist" );
-			String album = intent.getStringExtra( "album" );
 			String track = intent.getStringExtra( "track" );
+			String album = intent.getStringExtra( "album" );
 			Log.d( TAG, "NowPlaying = " + artist + ":" + album + ":" + track );
-			nowPlaying = new MetaData( artist, track, album );
-			updateMetadataDisplay( context );
+
+			pebbleMenu.setNowPlaying( artist, track, album );
+			pebbleMenu.updateDisplay( context );
 		}
+		else
+		{
+			Log.d( TAG, "Unknown intent: " + intent.toString() );
+		}
+
 	}
 
 	private static final String player_package = "com.google.android.music";
@@ -162,76 +139,14 @@ public class MusicIntentReceiver extends BroadcastReceiver
 
 	private void sendKeyEventIntent( Context context, KeyEvent keyEvent )
 	{
-		if( currentMediaMode == MediaMode.MUSIC_PLAYER )
+		pebbleMenu.onKeyEvent( context, keyEvent );
+		
+		if( pebbleMenu.isMediaMode() )
 		{
 			Intent intent = new Intent( Intent.ACTION_MEDIA_BUTTON );
 			intent.setClassName( player_package, player_class );
 			intent.putExtra( Intent.EXTRA_KEY_EVENT, keyEvent );
 			context.sendBroadcast( intent );
 		}
-		else
-		{
-			if( keyEvent.getAction() == KeyEvent.ACTION_DOWN )
-			{
-				pebbleMenu.onKeyEvent( context, keyEvent.getKeyCode() );
-			}
-		}
-		updateMetadataDisplay( context );
-	}
-
-	private void setMode( final Context context, MediaMode newMode )
-	{
-		switch( newMode )
-		{
-			case NO_CHANGE:
-				newMode = currentMediaMode;
-				break;
-			case TOGGLE:
-				newMode = currentMediaMode == MediaMode.MUSIC_PLAYER ? MediaMode.MENU : MediaMode.MUSIC_PLAYER;
-				break;
-			default:
-				break;
-		}
-
-		Log.d( TAG, "Switching mode from " + currentMediaMode + " to " + newMode );
-
-		currentMediaMode = newMode;
-
-		updateMetadataDisplay( context, true );
-	}
-
-	private void updateMetadataDisplay( Context context )
-	{
-		updateMetadataDisplay( context, false );
-	}
-
-	private void updateMetadataDisplay( Context context, boolean show )
-	{
-		if( currentMediaMode == MediaMode.MUSIC_PLAYER )
-		{
-			if( nowPlaying == null )
-			{
-				setMediaData( context, "", "", "" );
-			}
-			else
-			{
-				setMediaData( context, nowPlaying.artist, nowPlaying.track, nowPlaying.album );
-			}
-		}
-		else
-		{
-			if( show ) pebbleMenu.onShow( context );
-			setMediaData( context, pebbleMenu.getTop(), pebbleMenu.getMiddle(), pebbleMenu.getBottom() );
-
-		}
-	}
-
-	private void setMediaData( Context context, String artist, String track, String album )
-	{
-		final Intent i = new Intent( "com.getpebble.action.NOW_PLAYING" );
-		i.putExtra( "artist", artist );
-		i.putExtra( "track", track );
-		i.putExtra( "album", album );
-		context.sendBroadcast( i );
 	}
 }
