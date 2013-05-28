@@ -1,11 +1,13 @@
 package nl.jawsper.android.pebblemenu.menus;
 
+import java.util.Locale;
+
 import android.content.Context;
 import android.view.KeyEvent;
 
 public class PebbleMenu implements IPebbleMenu
 {
-	private static final IPebbleMenu[] menus = { new VolumeMenu(), new AgendaMenu() };
+	private static final IPebbleMenu[] menus = { new VolumeMenu(), new AgendaMenu(), new PhoneFinderMenu() };
 	private int selectedMenu = 0;
 	private IPebbleMenu currentMenu = null;
 
@@ -76,7 +78,7 @@ public class PebbleMenu implements IPebbleMenu
 		{
 			return currentMenu.getBottom();
 		}
-		return "...";
+		return String.format( Locale.getDefault(), "Menu %02d/%02d", selectedMenu + 1, menus.length );
 	}
 
 }
