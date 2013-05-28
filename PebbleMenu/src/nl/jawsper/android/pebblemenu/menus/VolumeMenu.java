@@ -34,12 +34,12 @@ public class VolumeMenu implements IPebbleMenu
 
 	@Override public String getTitle()
 	{
-		return "Volume";
+		return "Media volume";
 	}
 
 	@Override public String getTop()
 	{
-		return "Volume";
+		return "Media volume";
 	}
 
 	@Override public String getMiddle()
