@@ -14,10 +14,10 @@ public class VolumeMenu implements IPebbleMenu
 		currentVolume = mgr.getStreamVolume( AudioManager.STREAM_MUSIC );
 	}
 
-	@Override public void onKeyEvent( Context context, int keyCode )
+	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
 	{
 		AudioManager mgr = (AudioManager)context.getSystemService( Context.AUDIO_SERVICE );
-		switch( keyCode )
+		switch( keyEvent.getKeyCode() )
 		{
 			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
 				mgr.setStreamMute( AudioManager.STREAM_MUSIC, currentVolume > 0 );

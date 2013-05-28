@@ -17,9 +17,9 @@ public class AgendaMenu implements IPebbleMenu
 		events = CalendarEventInfo.readCalendarEvents( context, 5 );
 	}
 
-	@Override public void onKeyEvent( Context context, int keyCode )
+	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
 	{
-		switch( keyCode )
+		switch( keyEvent.getKeyCode() )
 		{
 			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
 				break;

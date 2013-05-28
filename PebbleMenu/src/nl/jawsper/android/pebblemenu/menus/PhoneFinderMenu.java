@@ -14,9 +14,9 @@ public class PhoneFinderMenu implements IPebbleMenu
 
 	}
 
-	@Override public void onKeyEvent( Context context, int keyCode )
+	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
 	{
-		if( keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE )
+		if( keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE )
 		{
 			Vibrator vib = (Vibrator)context.getSystemService( Context.VIBRATOR_SERVICE );
 			if( vibrating )

@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.KeyEvent;
 
-public class PebbleMenu
+public class PebbleMenu implements IPebbleMenu
 {
 	private static final String TAG = "PebbleMenu";
 	private static final IPebbleMenu[] menus = { new VolumeMenu(), new AgendaMenu(), new PhoneFinderMenu() };
@@ -15,7 +15,7 @@ public class PebbleMenu
 	private int selectedMenu = 0;
 	private IPebbleMenu currentMenu = null;
 
-	public void onShow( Context context )
+	@Override public void onShow( Context context )
 	{
 		if( currentMenu != null ) currentMenu.onShow( context );
 	}
@@ -84,7 +84,7 @@ public class PebbleMenu
 		context.sendBroadcast( i );
 	}
 
-	public void onKeyEvent( Context context, KeyEvent keyEvent )
+	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
 	{
 		Log.d( TAG, "onKeyEvent: " + keyEvent.getKeyCode() );
 		if( inMediaMode )
@@ -97,7 +97,7 @@ public class PebbleMenu
 			{
 				if( currentMenu != null )
 				{
-					currentMenu.onKeyEvent( context, keyEvent.getKeyCode() );
+					currentMenu.onKeyEvent( context, keyEvent );
 				}
 				else
 				{
@@ -122,12 +122,12 @@ public class PebbleMenu
 		updateDisplay( context );
 	}
 
-	public String getTitle()
+	@Override public String getTitle()
 	{
 		return getClass().getName();
 	}
 
-	public String getTop()
+	@Override public String getTop()
 	{
 		if( currentMenu != null )
 		{
@@ -136,7 +136,7 @@ public class PebbleMenu
 		return "Main menu";
 	}
 
-	public String getMiddle()
+	@Override public String getMiddle()
 	{
 		if( currentMenu != null )
 		{
@@ -145,7 +145,7 @@ public class PebbleMenu
 		return menus[selectedMenu].getTitle();
 	}
 
-	public String getBottom()
+	@Override public String getBottom()
 	{
 		if( currentMenu != null )
 		{
