@@ -5,7 +5,6 @@ import java.util.List;
 import nl.jawsper.android.agendatools.CalendarEventInfo;
 
 import android.content.Context;
-import android.view.KeyEvent;
 
 public class AgendaMenu implements IPebbleMenu
 {
@@ -17,19 +16,21 @@ public class AgendaMenu implements IPebbleMenu
 		events = CalendarEventInfo.readCalendarEvents( context, 5 );
 	}
 
-	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
+	@Override public void onButtonPressed( Context context, PebbleButton button )
 	{
-		switch( keyEvent.getKeyCode() )
+		switch( button )
 		{
-			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+			case BUTTON_SELECT:
 				break;
-			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+			case BUTTON_UP:
 				currentEvent--;
 				if( currentEvent < 0 ) currentEvent = events.size() - 1;
 				break;
-			case KeyEvent.KEYCODE_MEDIA_NEXT:
+			case BUTTON_DOWN:
 				currentEvent++;
 				if( currentEvent >= events.size() ) currentEvent = 0;
+				break;
+			default:
 				break;
 		}
 	}

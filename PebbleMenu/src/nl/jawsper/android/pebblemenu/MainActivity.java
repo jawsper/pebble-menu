@@ -3,9 +3,6 @@ package nl.jawsper.android.pebblemenu;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.jawsper.android.pebblemenu.receivers.MusicIntentReceiver;
-
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -42,7 +39,7 @@ public class MainActivity extends Activity
 			{
 				final MediaPlayer item = (MediaPlayer)parent.getItemAtPosition( position );
 				Toast.makeText( MainActivity.this, "Clicked: " + item.getName() + "\nPackageName: " + item.getPackageName() + "\nClassName: " + item.getClassName(), Toast.LENGTH_LONG ).show();
-				MusicIntentReceiver.setPlayer( item.getPackageName(), item.getClassName() );
+				PebbleMenu.setPlayer( item.getPackageName(), item.getClassName() );
 			}
 		} );
 	}

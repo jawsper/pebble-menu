@@ -2,7 +2,6 @@ package nl.jawsper.android.pebblemenu.menus;
 
 import android.content.Context;
 import android.media.AudioManager;
-import android.view.KeyEvent;
 
 public class VolumeMenu implements IPebbleMenu
 {
@@ -14,19 +13,21 @@ public class VolumeMenu implements IPebbleMenu
 		currentVolume = mgr.getStreamVolume( AudioManager.STREAM_MUSIC );
 	}
 
-	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
+	@Override public void onButtonPressed( Context context, PebbleButton button )
 	{
 		AudioManager mgr = (AudioManager)context.getSystemService( Context.AUDIO_SERVICE );
-		switch( keyEvent.getKeyCode() )
+		switch( button )
 		{
-			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+			case BUTTON_SELECT:
 				mgr.setStreamMute( AudioManager.STREAM_MUSIC, currentVolume > 0 );
 				break;
-			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+			case BUTTON_UP:
 				mgr.adjustStreamVolume( AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI );
 				break;
-			case KeyEvent.KEYCODE_MEDIA_NEXT:
+			case BUTTON_DOWN:
 				mgr.adjustStreamVolume( AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI );
+				break;
+			default:
 				break;
 		}
 		currentVolume = mgr.getStreamVolume( AudioManager.STREAM_MUSIC );

@@ -4,22 +4,24 @@ import java.util.Locale;
 
 import nl.jawsper.android.pebblemenu.menus.AgendaMenu;
 import nl.jawsper.android.pebblemenu.menus.IPebbleMenu;
+import nl.jawsper.android.pebblemenu.menus.PebbleButton;
 import nl.jawsper.android.pebblemenu.menus.PhoneFinderMenu;
 import nl.jawsper.android.pebblemenu.menus.VolumeMenu;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.KeyEvent;
 
-public class PebbleMenu implements IPebbleMenu
+public class PebbleMenu
 {
-	@SuppressWarnings( "unused" ) private static final String TAG = "PebbleMenu";
+	private static final String TAG = "PebbleMenu";
 	private static final IPebbleMenu[] menus = { new VolumeMenu(), new AgendaMenu(), new PhoneFinderMenu() };
 	private boolean inMediaMode = false;
 	private int selectedMenu = 0;
 	private IPebbleMenu currentMenu = null;
 
-	@Override public void onShow( Context context )
+	public void onShow( Context context )
 	{
 		if( currentMenu != null ) currentMenu.onShow( context );
 	}
@@ -31,7 +33,7 @@ public class PebbleMenu implements IPebbleMenu
 
 	public void onDoubleClick( Context context )
 	{
-		//Log.d( TAG, "onDoubleClick" );
+		// Log.d( TAG, "onDoubleClick" );
 		if( inMediaMode )
 		{
 			inMediaMode = false;
@@ -80,7 +82,7 @@ public class PebbleMenu implements IPebbleMenu
 
 	private void updateDisplay( Context context, String artist, String track, String album )
 	{
-		//Log.d( TAG, "updateDisplay" );
+		// Log.d( TAG, "updateDisplay" );
 		final Intent i = new Intent( "com.getpebble.action.NOW_PLAYING" );
 		i.putExtra( "artist", artist );
 		i.putExtra( "track", track );
@@ -88,50 +90,54 @@ public class PebbleMenu implements IPebbleMenu
 		context.sendBroadcast( i );
 	}
 
-	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
+	private void sendMediaKeyEvent( Context context, int action, int code )
 	{
-		//Log.d( TAG, "onKeyEvent: " + keyEvent.getKeyCode() );
+		KeyEvent keyEvent = new KeyEvent( action, code );
+		Intent intent = new Intent( Intent.ACTION_MEDIA_BUTTON );
+		intent.setClassName( player_package, player_class );
+		intent.putExtra( Intent.EXTRA_KEY_EVENT, keyEvent );
+		context.sendBroadcast( intent );
+	}
+
+	public void onButtonPressed( Context context, KeyEvent originalEvent, PebbleButton button )
+	{
+		//Log.d( TAG, "onButtonPressed" );
 		if( inMediaMode )
 		{
-			// do nothing, the higher layer will handle it
+			sendMediaKeyEvent( context, KeyEvent.ACTION_DOWN, originalEvent.getKeyCode() );
+			sendMediaKeyEvent( context, KeyEvent.ACTION_UP, originalEvent.getKeyCode() );
 		}
 		else
 		{
-			if( keyEvent.getAction() == KeyEvent.ACTION_DOWN )
+			if( currentMenu != null )
 			{
-				if( currentMenu != null )
+				currentMenu.onButtonPressed( context, button );
+			}
+			else
+			{
+				switch( button )
 				{
-					currentMenu.onKeyEvent( context, keyEvent );
-				}
-				else
-				{
-					switch( keyEvent.getKeyCode() )
-					{
-						case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-							currentMenu = menus[selectedMenu];
-							currentMenu.onShow( context );
-							break;
-						case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-							selectedMenu--;
-							if( selectedMenu < 0 ) selectedMenu = menus.length - 1;
-							break;
-						case KeyEvent.KEYCODE_MEDIA_NEXT:
-							selectedMenu++;
-							if( selectedMenu >= menus.length ) selectedMenu = 0;
-							break;
-					}
+					case BUTTON_SELECT:
+						currentMenu = menus[selectedMenu];
+						currentMenu.onShow( context );
+						break;
+					case BUTTON_UP:
+						selectedMenu--;
+						if( selectedMenu < 0 ) selectedMenu = menus.length - 1;
+						break;
+					case BUTTON_DOWN:
+						selectedMenu++;
+						if( selectedMenu >= menus.length ) selectedMenu = 0;
+						break;
+					default:
+						break;
 				}
 			}
 		}
 		updateDisplay( context );
 	}
 
-	@Override public String getTitle()
-	{
-		return getClass().getName();
-	}
-
-	@Override public String getTop()
+	public String getTop()
 	{
 		if( currentMenu != null )
 		{
@@ -140,7 +146,7 @@ public class PebbleMenu implements IPebbleMenu
 		return "Main menu";
 	}
 
-	@Override public String getMiddle()
+	public String getMiddle()
 	{
 		if( currentMenu != null )
 		{
@@ -149,7 +155,7 @@ public class PebbleMenu implements IPebbleMenu
 		return menus[selectedMenu].getTitle();
 	}
 
-	@Override public String getBottom()
+	public String getBottom()
 	{
 		if( currentMenu != null )
 		{
@@ -158,4 +164,15 @@ public class PebbleMenu implements IPebbleMenu
 		return String.format( Locale.getDefault(), "Menu %02d/%02d", selectedMenu + 1, menus.length );
 	}
 
+	// media player stuff
+
+	private static String player_package = "com.google.android.music";
+	private static String player_class = "com.google.android.music.playback.MediaButtonIntentReceiver";
+
+	public static void setPlayer( String packageName, String className )
+	{
+		Log.d( TAG, "Setting player to " + packageName );
+		player_package = packageName;
+		player_class = className;
+	}
 }

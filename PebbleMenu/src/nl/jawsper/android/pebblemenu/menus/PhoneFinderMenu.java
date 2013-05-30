@@ -2,7 +2,6 @@ package nl.jawsper.android.pebblemenu.menus;
 
 import android.content.Context;
 import android.os.Vibrator;
-import android.view.KeyEvent;
 
 public class PhoneFinderMenu implements IPebbleMenu
 {
@@ -14,9 +13,9 @@ public class PhoneFinderMenu implements IPebbleMenu
 
 	}
 
-	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
+	@Override public void onButtonPressed( Context context, PebbleButton button )
 	{
-		if( keyEvent.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE )
+		if( button == PebbleButton.BUTTON_SELECT )
 		{
 			Vibrator vib = (Vibrator)context.getSystemService( Context.VIBRATOR_SERVICE );
 			if( vibrating )
