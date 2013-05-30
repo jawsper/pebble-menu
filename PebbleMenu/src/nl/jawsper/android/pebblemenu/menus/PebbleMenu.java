@@ -107,11 +107,11 @@ public class PebbleMenu implements IPebbleMenu
 							currentMenu = menus[selectedMenu];
 							currentMenu.onShow( context );
 							break;
-						case KeyEvent.KEYCODE_MEDIA_NEXT:
+						case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
 							selectedMenu--;
 							if( selectedMenu < 0 ) selectedMenu = menus.length - 1;
 							break;
-						case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+						case KeyEvent.KEYCODE_MEDIA_NEXT:
 							selectedMenu++;
 							if( selectedMenu >= menus.length ) selectedMenu = 0;
 							break;

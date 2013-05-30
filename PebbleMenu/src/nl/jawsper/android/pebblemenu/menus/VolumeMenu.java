@@ -22,10 +22,10 @@ public class VolumeMenu implements IPebbleMenu
 			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
 				mgr.setStreamMute( AudioManager.STREAM_MUSIC, currentVolume > 0 );
 				break;
-			case KeyEvent.KEYCODE_MEDIA_NEXT:
+			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
 				mgr.adjustStreamVolume( AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI );
 				break;
-			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+			case KeyEvent.KEYCODE_MEDIA_NEXT:
 				mgr.adjustStreamVolume( AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI );
 				break;
 		}

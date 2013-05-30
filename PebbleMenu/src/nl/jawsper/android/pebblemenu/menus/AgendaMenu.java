@@ -23,11 +23,11 @@ public class AgendaMenu implements IPebbleMenu
 		{
 			case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
 				break;
-			case KeyEvent.KEYCODE_MEDIA_NEXT:
+			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
 				currentEvent--;
 				if( currentEvent < 0 ) currentEvent = events.size() - 1;
 				break;
-			case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+			case KeyEvent.KEYCODE_MEDIA_NEXT:
 				currentEvent++;
 				if( currentEvent >= events.size() ) currentEvent = 0;
 				break;
