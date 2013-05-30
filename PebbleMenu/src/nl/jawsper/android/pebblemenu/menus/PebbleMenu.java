@@ -89,7 +89,7 @@ public class PebbleMenu implements IPebbleMenu
 		Log.d( TAG, "onKeyEvent: " + keyEvent.getKeyCode() );
 		if( inMediaMode )
 		{
-
+			// do nothing, the higher layer will handle it
 		}
 		else
 		{
