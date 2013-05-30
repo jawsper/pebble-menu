@@ -7,8 +7,9 @@
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="17" />
-    <uses-permission android:name="android.permission.READ_CALENDAR"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -24,13 +25,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="PebbleVolumeService"></service>
-        <receiver android:name="MusicIntentReceiver">
+
+        <receiver android:name="nl.jawsper.android.pebblemenu.receivers.MediaButtonReceiver" >
             <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON"/>
-                <action android:name="com.android.music.playstatechanged" />
-                <action android:name="com.android.music.metachanged" />
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="nl.jawsper.android.pebblemenu.receivers.PebbleReceiver">
+            <intent-filter>
                 <action android:name="com.getpebble.action.app.RECEIVE" />
+                <action android:name="com.getpebble.action.app.ACK" />
+                <action android:name="com.getpebble.action.app.NACK" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="nl.jawsper.android.pebblemenu.receivers.MusicIntentReceiver" >
+            <intent-filter>
+                <action android:name="com.amazon.mp3.metachanged" />
+                <action android:name="com.andrew.apollo.metachanged" />
+                <action android:name="com.android.music.metachanged" />
+                <action android:name="com.htc.music.metachanged" />
+                <action android:name="com.miui.player.metachanged" />
+                <action android:name="com.rdio.android.metachanged" />
+                <action android:name="com.real.IMP.metachanged" />
+                <action android:name="com.samsung.sec.android.MusicPlayer.metachanged" />
+                <action android:name="com.sec.android.app.music.metachanged" />
+                <action android:name="com.sonyericsson.music.metachanged" />
             </intent-filter>
         </receiver>
     </application>

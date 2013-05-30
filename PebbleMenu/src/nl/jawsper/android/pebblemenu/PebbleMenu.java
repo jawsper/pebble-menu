@@ -1,15 +1,19 @@
-package nl.jawsper.android.pebblemenu.menus;
+package nl.jawsper.android.pebblemenu;
 
 import java.util.Locale;
 
+import nl.jawsper.android.pebblemenu.menus.AgendaMenu;
+import nl.jawsper.android.pebblemenu.menus.IPebbleMenu;
+import nl.jawsper.android.pebblemenu.menus.PhoneFinderMenu;
+import nl.jawsper.android.pebblemenu.menus.VolumeMenu;
+
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.KeyEvent;
 
 public class PebbleMenu implements IPebbleMenu
 {
-	private static final String TAG = "PebbleMenu";
+	@SuppressWarnings( "unused" ) private static final String TAG = "PebbleMenu";
 	private static final IPebbleMenu[] menus = { new VolumeMenu(), new AgendaMenu(), new PhoneFinderMenu() };
 	private boolean inMediaMode = false;
 	private int selectedMenu = 0;
@@ -27,7 +31,7 @@ public class PebbleMenu implements IPebbleMenu
 
 	public void onDoubleClick( Context context )
 	{
-		Log.d( TAG, "onDoubleClick" );
+		//Log.d( TAG, "onDoubleClick" );
 		if( inMediaMode )
 		{
 			inMediaMode = false;
@@ -76,7 +80,7 @@ public class PebbleMenu implements IPebbleMenu
 
 	private void updateDisplay( Context context, String artist, String track, String album )
 	{
-		Log.d( TAG, "updateDisplay" );
+		//Log.d( TAG, "updateDisplay" );
 		final Intent i = new Intent( "com.getpebble.action.NOW_PLAYING" );
 		i.putExtra( "artist", artist );
 		i.putExtra( "track", track );
@@ -86,7 +90,7 @@ public class PebbleMenu implements IPebbleMenu
 
 	@Override public void onKeyEvent( Context context, KeyEvent keyEvent )
 	{
-		Log.d( TAG, "onKeyEvent: " + keyEvent.getKeyCode() );
+		//Log.d( TAG, "onKeyEvent: " + keyEvent.getKeyCode() );
 		if( inMediaMode )
 		{
 			// do nothing, the higher layer will handle it
