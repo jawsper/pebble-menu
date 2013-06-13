@@ -1,5 +1,7 @@
 package nl.jawsper.android.pebblemenu;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import nl.jawsper.android.pebblemenu.menus.AgendaMenu;
@@ -10,11 +12,21 @@ import nl.jawsper.android.pebblemenu.menus.VolumeMenu;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.util.Log;
 import android.view.KeyEvent;
 
 public class PebbleMenu
 {
+	private static PebbleMenu sInstance = new PebbleMenu();
+
+	public static PebbleMenu getInstance()
+	{
+		return sInstance;
+	}
+
 	private static final String TAG = "PebbleMenu";
 	private static final IPebbleMenu[] menus = { new VolumeMenu(), new AgendaMenu(), new PhoneFinderMenu() };
 	private boolean inMediaMode = false;
@@ -94,14 +106,14 @@ public class PebbleMenu
 	{
 		KeyEvent keyEvent = new KeyEvent( action, code );
 		Intent intent = new Intent( Intent.ACTION_MEDIA_BUTTON );
-		intent.setClassName( player_package, player_class );
+		intent.setClassName( m_MediaPlayer.getPackageName(), m_MediaPlayer.getClassName() );
 		intent.putExtra( Intent.EXTRA_KEY_EVENT, keyEvent );
 		context.sendBroadcast( intent );
 	}
 
 	public void onButtonPressed( Context context, KeyEvent originalEvent, PebbleButton button )
 	{
-		//Log.d( TAG, "onButtonPressed" );
+		// Log.d( TAG, "onButtonPressed" );
 		if( inMediaMode )
 		{
 			sendMediaKeyEvent( context, KeyEvent.ACTION_DOWN, originalEvent.getKeyCode() );
@@ -165,14 +177,36 @@ public class PebbleMenu
 	}
 
 	// media player stuff
+	private MediaPlayer m_MediaPlayer;
 
-	private static String player_package = "com.google.android.music";
-	private static String player_class = "com.google.android.music.playback.MediaButtonIntentReceiver";
-
-	public static void setPlayer( String packageName, String className )
+	public void setMediaPlayer( MediaPlayer a_MediaPlayer )
 	{
-		Log.d( TAG, "Setting player to " + packageName );
-		player_package = packageName;
-		player_class = className;
+		Log.d( TAG, "Setting MediaPlayer to " + a_MediaPlayer.toString() );
+		m_MediaPlayer = a_MediaPlayer;
+	}
+
+	public MediaPlayer getMediaPlayer()
+	{
+		return m_MediaPlayer;
+	}
+
+	public static List<MediaPlayer> getMediaPlayers( final Context context )
+	{
+		List<MediaPlayer> players = new ArrayList<MediaPlayer>();
+
+		PackageManager mgr = context.getPackageManager();
+
+		final Intent mediaButtons = new Intent( "android.intent.action.MEDIA_BUTTON" );
+		for( ResolveInfo nfo : mgr.queryBroadcastReceivers( mediaButtons, 0 ) )
+		{
+			ActivityInfo activity = nfo.activityInfo;
+			if( activity != null && activity.applicationInfo != null )
+			{
+				if( activity.packageName.startsWith( "nl.jawsper.android.pebblemenu" ) ) continue;
+				players.add( new MediaPlayer( activity.applicationInfo.loadLabel( mgr ).toString(), activity.packageName, activity.name ) );
+			}
+		}
+
+		return players;
 	}
 }

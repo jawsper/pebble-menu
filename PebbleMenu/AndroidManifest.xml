@@ -30,13 +30,6 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-        <receiver android:name="nl.jawsper.android.pebblemenu.receivers.PebbleReceiver">
-            <intent-filter>
-                <action android:name="com.getpebble.action.app.RECEIVE" />
-                <action android:name="com.getpebble.action.app.ACK" />
-                <action android:name="com.getpebble.action.app.NACK" />
-            </intent-filter>
-        </receiver>
         <receiver android:name="nl.jawsper.android.pebblemenu.receivers.MusicNowPlayingReceiver" >
             <intent-filter>
                 <action android:name="com.amazon.mp3.metachanged" />

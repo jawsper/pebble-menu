@@ -19,16 +19,16 @@ public class CalendarEventInfo
 	// private static final String[] projection = new String[] { CalendarContract.Events._ID, CalendarContract.Events.TITLE, CalendarContract.Events.DTSTART, CalendarContract.Events.DTEND, CalendarContract.Events.EVENT_LOCATION };
 	long id;
 	String title;
-	long dtstart;
-	long dtend;
+	Date dtstart;
+	Date dtend;
 	String location;
 
 	public CalendarEventInfo( Cursor cursor )
 	{
 		this.id = cursor.getLong( cursor.getColumnIndex( CalendarContract.Events._ID ) );
 		this.title = cursor.getString( cursor.getColumnIndex( CalendarContract.Events.TITLE ) );
-		this.dtstart = cursor.getLong( cursor.getColumnIndex( CalendarContract.Events.DTSTART ) );
-		this.dtend = cursor.getLong( cursor.getColumnIndex( CalendarContract.Events.DTEND ) );
+		this.dtstart = new Date( cursor.getLong( cursor.getColumnIndex( CalendarContract.Events.DTSTART ) ) );
+		this.dtend = new Date( cursor.getLong( cursor.getColumnIndex( CalendarContract.Events.DTEND ) ) );
 		this.location = cursor.getString( cursor.getColumnIndex( CalendarContract.Events.EVENT_LOCATION ) );
 	}
 
@@ -42,34 +42,45 @@ public class CalendarEventInfo
 		return this.title;
 	}
 
-	public long getDtstart()
+	public Date getDtstart()
 	{
 		return this.dtstart;
 	}
 
 	public String getDtstartFormatted()
 	{
-		return new SimpleDateFormat( "EEE HH:mm", Locale.getDefault() ).format( new Date( this.dtstart ) );
+		return getDateFormatted( this.dtstart, "EEE HH:mm" );
 	}
 
 	public String getDtendFormatted()
 	{
-		return new SimpleDateFormat( "HH:mm", Locale.getDefault() ).format( new Date( this.dtend ) );
+		return getDateFormatted( this.dtend, "HH:mm" );
 	}
 
-	public String getStartToEndFormatted()
+	private String getDateFormatted( Date date, String format )
 	{
-		return String.format( Locale.getDefault(), "%s - %s", getDtstartFormatted(), getDtendFormatted() );
+		return new SimpleDateFormat( format, Locale.getDefault() ).format( date );
+	}
+
+	@SuppressWarnings( "deprecation" ) public String getStartToEndFormatted()
+	{
+		String fmt_start = "EEE HH:mm";
+		String fmt_end = "HH:mm";
+		if( this.dtstart.getDate() != this.dtend.getDate() )
+		{
+			fmt_end = fmt_start;
+		}
+		return String.format( Locale.getDefault(), "%s - %s", getDateFormatted( this.dtstart, fmt_start ), getDateFormatted( this.dtend, fmt_end ) );
 	}
 
 	public byte[] getPebbleCalendarTime( int which )
 	{
 		Calendar cal = Calendar.getInstance( Locale.getDefault() );
-		cal.setTimeInMillis( which == 0 ? this.dtstart : this.dtend );
+		cal.setTimeInMillis( ( which == 0 ? this.dtstart : this.dtend ).getTime() );
 		byte[] data = new byte[6];
 
-		data[0] = (byte)( cal.get( Calendar.YEAR ) & 0xFF );
-		data[1] = (byte)( cal.get( Calendar.YEAR ) >> 8 );
+		data[0] = (byte)( cal.get( Calendar.YEAR ) >> 8 );
+		data[1] = (byte)( cal.get( Calendar.YEAR ) & 0xFF );
 		data[2] = (byte)( cal.get( Calendar.MONTH ) & 0xFF );
 		data[3] = (byte)( cal.get( Calendar.DAY_OF_MONTH ) & 0xFF );
 		data[4] = (byte)( cal.get( Calendar.HOUR ) & 0xFF );
@@ -228,9 +239,9 @@ public class CalendarEventInfo
 			if( cursor.moveToFirst() )
 			{
 				long now = Calendar.getInstance().getTimeInMillis();
-				while( cursor.moveToNext()  && events.size() < count )
+				while( cursor.moveToNext() && events.size() < count )
 				{
-					//long dtstart = cursor.getLong( cursor.getColumnIndex( CalendarContract.Events.DTSTART ) );
+					// long dtstart = cursor.getLong( cursor.getColumnIndex( CalendarContract.Events.DTSTART ) );
 					long dtend = cursor.getLong( cursor.getColumnIndex( CalendarContract.Events.DTEND ) );
 					if( dtend >= now )
 					{

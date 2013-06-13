@@ -2,6 +2,7 @@ package nl.jawsper.android.pebblemenu.receivers;
 
 import java.util.Date;
 
+import nl.jawsper.android.pebblemenu.PebbleMenu;
 import nl.jawsper.android.pebblemenu.menus.PebbleButton;
 
 import android.content.BroadcastReceiver;
@@ -19,16 +20,14 @@ public class MediaButtonReceiver extends BroadcastReceiver
 	private static long lastButtonPressed = 0;
 	private static Runnable doubleClickTimeout = null;
 
-	private static Handler handler = new Handler()
-	{
-	};
+	private static Handler handler = new Handler();
 
 	@Override public void onReceive( final Context context, final Intent intent )
 	{
 		if( intent.getAction() == Intent.ACTION_MEDIA_BUTTON )
 		{
 			final KeyEvent keyEvent = (KeyEvent)intent.getExtras().get( Intent.EXTRA_KEY_EVENT );
-			// Log.d( TAG, "KeyEvent: " + Integer.toString( keyEvent.getAction() ) + "; " + keyEvent.getKeyCode() );
+			// Log.d( getClass().getName(), "KeyEvent: " + Integer.toString( keyEvent.getAction() ) + "; " + keyEvent.getKeyCode() );
 
 			if( keyEvent.getAction() == KeyEvent.ACTION_DOWN )
 			{
@@ -53,6 +52,7 @@ public class MediaButtonReceiver extends BroadcastReceiver
 							@Override public void run()
 							{
 								// Log.d( TAG, "DoubleClick timeout!" );
+								doubleClickTimeout = null;
 								lastButtonPressed = 0;
 
 								sendButton( context, keyEvent, PebbleButton.BUTTON_SELECT );
@@ -75,18 +75,20 @@ public class MediaButtonReceiver extends BroadcastReceiver
 				}
 			}
 		}
-
-		// send to Menu
-		// intent.setClass( context, MusicIntentReceiver.class );
-		// context.sendBroadcast( intent );
 	}
 
 	private void sendButton( final Context context, KeyEvent originalEvent, PebbleButton button )
 	{
-		Intent intent = new Intent( "nl.jawsper.android.pebblemenu.PEBBLE_BUTTON" );
-		intent.setClass( context, MusicIntentReceiver.class );
-		intent.putExtra( "PEBBLE_BUTTON", button );
-		intent.putExtra( Intent.EXTRA_KEY_EVENT, originalEvent );
-		context.sendBroadcast( intent );
+		// Log.d( getClass().getName(), "Sending button: " + button.toString() );
+		switch( button )
+		{
+			case BUTTON_SELECT_DOUBLECLICK:
+				PebbleMenu.getInstance().onDoubleClick( context );
+				break;
+			default:
+				PebbleMenu.getInstance().onButtonPressed( context, originalEvent, button );
+				break;
+		}
+		PebbleMenu.getInstance().updateDisplay( context );
 	}
 }
