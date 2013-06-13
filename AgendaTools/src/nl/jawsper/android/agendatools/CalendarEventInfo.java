@@ -47,16 +47,6 @@ public class CalendarEventInfo
 		return this.dtstart;
 	}
 
-	public String getDtstartFormatted()
-	{
-		return getDateFormatted( this.dtstart, "EEE HH:mm" );
-	}
-
-	public String getDtendFormatted()
-	{
-		return getDateFormatted( this.dtend, "HH:mm" );
-	}
-
 	private String getDateFormatted( Date date, String format )
 	{
 		return new SimpleDateFormat( format, Locale.getDefault() ).format( date );
